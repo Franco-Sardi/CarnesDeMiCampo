@@ -1,0 +1,103 @@
+import { useParams, Link } from 'react-router-dom'
+import { motion } from 'motion/react'
+import Map, { Marker } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { sucursales } from '../data/productos'
+
+const coords: Record<number, [number, number]> = {
+  1: [-68.5017, -32.9282],
+  2: [-68.5000, -32.9270],
+  3: [-68.5750, -32.9830],
+  4: [-68.5780, -32.9800],
+  5: [-68.5050, -32.9250],
+  6: [-68.5650, -32.9700],
+}
+
+export default function SucursalPage() {
+  const { id } = useParams()
+  const suc = sucursales.find(s => s.id === Number(id))
+
+  if (!suc) return (
+    <div className="flex min-h-screen items-center justify-center bg-dark">
+      <div className="text-center">
+        <h1 className="font-heading text-3xl text-cream">Sucursal no encontrada</h1>
+        <Link to="/" className="mt-4 inline-block text-sm text-campo hover:text-campo-light">← Volver al inicio</Link>
+      </div>
+    </div>
+  )
+
+  const [lng, lat] = coords[suc.id] || [-68.54, -32.95]
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suc.direccion)}`
+
+  return (
+    <div className="min-h-screen bg-dark">
+      {/* Header */}
+      <div className="bg-campo-dark">
+        <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
+          <Link to="/#sucursales" className="text-xs text-cream/40 transition-colors hover:text-cream">← Volver a sucursales</Link>
+        </div>
+      </div>
+
+      {/* Map hero */}
+      <div className="h-[40vh] sm:h-[50vh]">
+        <Map initialViewState={{ longitude: lng, latitude: lat, zoom: 14 }}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+          attributionControl={false}>
+          <Marker longitude={lng} latitude={lat} anchor="bottom">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-campo bg-campo/20 shadow-lg shadow-campo/20">
+              <div className="h-3 w-3 rounded-full bg-campo-50" />
+            </div>
+          </Marker>
+        </Map>
+      </div>
+
+      {/* Content */}
+      <div className="mx-auto max-w-3xl px-5 py-12 sm:px-6 sm:py-16">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <span className="font-heading text-5xl font-light text-dark-border">{String(suc.id).padStart(2, '0')}</span>
+          <h1 className="mt-2 font-heading text-3xl font-bold text-cream sm:text-4xl">{suc.nombre}</h1>
+          <div className="mt-1 h-px w-16 bg-campo" />
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="mt-8 grid gap-6 sm:grid-cols-2">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Dirección</h3>
+              <p className="mt-1 text-sm text-cream/70">{suc.direccion}</p>
+            </div>
+            <div>
+              <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Teléfono</h3>
+              <p className="mt-1 text-sm text-cream/70">{suc.telefono}</p>
+            </div>
+            <div>
+              <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Horario</h3>
+              <p className="mt-1 text-sm text-cream/70">{suc.horario}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 border border-campo bg-campo px-6 py-3 text-xs font-semibold uppercase tracking-wider text-cream transition-all hover:bg-campo-light">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              Cómo llegar
+            </a>
+            <a href={`https://wa.me/54${suc.telefono.replace(/[^0-9]/g, '')}`}
+              target="_blank" rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 border border-[#25D366]/20 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[#25D366] transition-all hover:bg-[#25D366]/10">
+              WhatsApp
+            </a>
+            <a href={`tel:+54${suc.telefono.replace(/[^0-9]/g, '')}`}
+              className="flex items-center justify-center gap-2 border border-dark-border px-6 py-3 text-xs font-semibold uppercase tracking-wider text-cream/50 transition-all hover:border-cream/30 hover:text-cream">
+              Llamar
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  )
+}
