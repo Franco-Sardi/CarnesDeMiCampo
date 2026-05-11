@@ -6,7 +6,7 @@ const VIDEO_POSTER = '/hero-poster.jpg'
 
 export default function Hero() {
   return (
-    <section id="inicio" className="relative flex min-h-[100svh] flex-col overflow-hidden">
+    <section id="inicio" className="relative flex flex-col overflow-hidden lg:min-h-[100svh]">
       {/* Background photography */}
       <div
         className="absolute inset-0 bg-cover bg-center"
@@ -21,8 +21,8 @@ export default function Hero() {
       {/* Navbar spacer fijo */}
       <div className="h-20 shrink-0 lg:h-24" />
 
-      {/* Contenido — centrado verticalmente en el espacio restante */}
-      <div className="relative z-10 flex flex-1 w-full items-center px-8 py-8 lg:px-16 lg:py-12">
+      {/* Contenido — en mobile pegado arriba, en desktop centrado vertical */}
+      <div className="relative z-10 flex flex-1 w-full items-start px-6 pt-2 pb-8 sm:px-8 sm:pt-4 sm:pb-10 lg:items-center lg:px-16 lg:py-12">
         <div className="mx-auto max-w-7xl w-full">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-20">
 
@@ -36,7 +36,7 @@ export default function Hero() {
               >
                 <div className="mb-3 h-[2px] w-10 bg-dorado" />
                 <p className="text-[10px] font-medium uppercase tracking-[0.4em] text-dorado/80">
-                  Del productor a tu mesa · Mendoza
+                  Del productor a tu mesa
                 </p>
               </motion.div>
 
@@ -69,25 +69,25 @@ export default function Hero() {
                 transition={{ duration: 0.7, delay: 0.98 }}
                 className="mt-4 max-w-sm text-[13px] leading-relaxed text-cream/50 sm:text-sm lg:mt-7"
               >
-                100% integrados. Del ganado Hereford y Angus criado en Mendoza,
-                directo a tu mesa. Sin intermediarios.
+                100% integrados. De nuestro feedlot directo a tu mesa.
+                Sin intermediarios.
               </motion.p>
 
               <motion.div
                 initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 1.12 }}
-                className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:gap-4 lg:mt-10"
+                className="mt-6 flex flex-row flex-wrap items-center gap-3 sm:gap-4 lg:mt-10"
               >
                 <a
                   href="#productos"
-                  className="cursor-pointer border border-campo bg-campo px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-cream transition-colors duration-300 hover:bg-campo-light"
+                  className="cursor-pointer border border-campo bg-campo px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream transition-colors duration-300 hover:bg-campo-light sm:px-7 sm:text-[11px]"
                 >
                   Ver Productos
                 </a>
                 <a
                   href="#contacto"
-                  className="group relative cursor-pointer overflow-hidden border border-dorado/40 px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-cream/70 transition-colors duration-300 hover:border-dorado hover:text-cream"
+                  className="group relative cursor-pointer overflow-hidden border border-dorado/40 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream/70 transition-colors duration-300 hover:border-dorado hover:text-cream sm:px-7 sm:text-[11px]"
                 >
                   <span className="absolute inset-0 -translate-x-full bg-dorado/10 transition-transform duration-500 group-hover:translate-x-0" />
                   <span className="relative">Contactanos</span>
@@ -118,7 +118,7 @@ export default function Hero() {
                   />
                 </div>
                 <p className="mt-1 text-right text-[9px] uppercase tracking-[0.28em] text-dorado/35">
-                  Nuestro campo · Mendoza
+                  Nuestro campo
                 </p>
               </motion.div>
 
@@ -166,7 +166,7 @@ export default function Hero() {
                 transition={{ delay: 2.2, duration: 0.7 }}
                 className="mt-1 text-right text-[9px] uppercase tracking-[0.28em] text-dorado/35"
               >
-                Nuestro campo · Mendoza
+                Nuestro campo
               </motion.p>
             </motion.div>
 
@@ -179,7 +179,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.9 }}
-        className="absolute bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-5 left-1/2 -translate-x-1/2 hidden flex-col items-center gap-2 lg:flex"
       >
         <span className="text-[8px] uppercase tracking-[0.35em] text-cream/20">Scroll</span>
         <motion.div

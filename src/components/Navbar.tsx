@@ -65,7 +65,7 @@ export default function Navbar() {
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
           <Link to="/" className="cursor-pointer">
-            <img src={logo} alt="Carnes de mi Campo" className="h-12 w-auto sm:h-14" />
+            <img src={logo} alt="Carnes de mi Campo" className="h-14 w-auto sm:h-16" />
           </Link>
 
           {/* Desktop nav */}

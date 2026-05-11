@@ -77,8 +77,8 @@ export default function SobreNosotros() {
   return (
     <section ref={sectionRef} id="nosotros" className="bg-dark-soft">
 
-      {/* ── Scroll-linked opposing marquee ── */}
-      <div className="overflow-hidden border-y border-dark-border py-5">
+      {/* ── Scroll-linked opposing marquee (solo desktop, en mobile se veía cortado) ── */}
+      <div className="hidden overflow-hidden border-y border-dark-border py-5 lg:block">
         <motion.p
           style={{ x: xLeft }}
           className="whitespace-nowrap font-heading text-[clamp(1.6rem,3.5vw,3rem)] font-bold uppercase leading-none tracking-[0.12em] text-cream/[0.05]"
@@ -95,7 +95,114 @@ export default function SobreNosotros() {
 
       {/* ── Main content ── */}
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-20 lg:items-start">
+
+        {/* ── MOBILE: diseño editorial limpio ── */}
+        <div className="lg:hidden">
+          {/* Header centrado */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+            className="text-center"
+          >
+            <div className="mx-auto mb-3 h-[2px] w-10 bg-dorado" />
+            <span className="text-[10px] font-medium uppercase tracking-[0.38em] text-dorado/60">
+              Quiénes somos
+            </span>
+            <h2 className="mt-5 font-heading text-3xl font-bold leading-tight text-cream sm:text-4xl">
+              El sabor de <span className="text-gradient-gold">nuestra historia</span>
+            </h2>
+            <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-cream/55">
+              Desde 2006 somos una empresa 100% integrada: participamos en cada eslabón de la cadena de valor, desde la cría del ganado hasta el mostrador. Sin intermediarios.
+            </p>
+          </motion.div>
+
+          {/* Stats 2x2 — cards limpias */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.55, delay: 0.15 }}
+            className="mt-10 grid grid-cols-2 gap-px border border-dark-border bg-dark-border"
+          >
+            {stats.map((s) => (
+              <div key={s.label} className="bg-dark-soft px-4 py-5 text-center">
+                <div className="font-display text-2xl font-light italic leading-none text-dorado">
+                  <CountUp from={s.from} to={s.to} suffix={s.suffix} />
+                </div>
+                <div className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.25em] text-cream/30">
+                  {s.label}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Pilares — cards con borde dorado a la izq, sin 3D */}
+          <motion.div
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08 } } }}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+            className="mt-8 space-y-3"
+          >
+            {pilares.map((p) => (
+              <motion.div
+                key={p.n}
+                variants={{
+                  hidden:  { opacity: 0, x: 14 },
+                  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+                }}
+                className="border-l-2 border-dorado/30 bg-dark-card py-4 pl-5 pr-4"
+              >
+                <div className="mb-1.5 flex items-baseline gap-2.5">
+                  <span className="font-display text-sm italic text-dorado/55">{p.n}</span>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cream/85">{p.title}</p>
+                </div>
+                <p className="text-xs leading-relaxed text-cream/45">{p.desc}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ delay: 0.2 }}
+            className="mt-10 flex justify-center"
+          >
+            <a
+              href="/#contacto"
+              className="group relative inline-flex cursor-pointer items-center gap-3 overflow-hidden border border-dorado/30 px-6 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-cream/70 transition-colors duration-300 hover:border-dorado hover:text-cream"
+            >
+              <span className="relative">Contactanos</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="relative transition-transform group-hover:translate-x-1">
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </a>
+          </motion.div>
+
+          {/* Logo grande al final */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="mt-12 flex justify-center"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-dorado/15 blur-3xl scale-125" />
+              <div className="absolute inset-[-14px] rounded-full border border-dashed border-dorado/20" />
+              <div className="absolute inset-[-6px] rounded-full border border-dorado/30" />
+              <img src={logo} alt="Carnes de mi Campo" className="relative h-32 w-auto" />
+            </div>
+          </motion.div>
+
+        </div>
+
+        {/* ── DESKTOP: layout original (kept as-is) ── */}
+        <div className="hidden gap-12 lg:grid lg:grid-cols-[1fr_1.15fr] lg:gap-20 lg:items-start">
 
           {/* ── Left: editorial text block ── */}
           <div>
@@ -146,7 +253,7 @@ export default function SobreNosotros() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, amount: 0 }}
               transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-12 flex justify-center"
+              className="mt-8 flex justify-center sm:mt-12"
             >
               <div className="relative">
                 {/* Glow dorado detrás */}
@@ -158,7 +265,7 @@ export default function SobreNosotros() {
                 <img
                   src={logo}
                   alt="Carnes de mi Campo"
-                  className="relative h-44 w-auto"
+                  className="relative h-28 w-auto sm:h-36 lg:h-44"
                 />
               </div>
             </motion.div>

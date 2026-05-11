@@ -1,11 +1,11 @@
 const items = [
   'Cortes Selectos',
-  'Hereford × Angus',
-  'Mendoza',
+  'Feedlot Propio',
   '100% Integrado',
   'Del Campo',
   'Artesanal',
   'Premium',
+  'Frescura Diaria',
   'Tradición',
 ]
 
@@ -18,8 +18,8 @@ export default function Marquee() {
         {[...Array(4)].map((_, i) => (
           <span
             key={i}
-            className="whitespace-nowrap font-display text-lg font-light italic tracking-wide text-transparent sm:text-2xl"
-            style={{ WebkitTextStroke: '1px rgba(192, 144, 64, 0.28)' }}
+            className="whitespace-nowrap font-display text-xl font-light italic tracking-wide text-transparent sm:text-2xl"
+            style={{ WebkitTextStroke: '1px rgba(192, 144, 64, 0.45)' }}
           >
             {text}
           </span>

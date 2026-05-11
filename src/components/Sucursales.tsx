@@ -121,12 +121,13 @@ export default function Sucursales() {
         <div className="mt-6 grid grid-cols-2 gap-px bg-dark-border sm:grid-cols-3 lg:grid-cols-6">
           {sucursales.map((suc, i) => (
             <motion.div key={suc.id} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-              viewport={{ once: true }} transition={{ delay: i * 0.05 }}>
+              viewport={{ once: true }} transition={{ delay: i * 0.05 }}
+              className="flex">
               <Link to={`/sucursal/${suc.id}`}
                 onMouseEnter={() => setSelected(suc.id)}
-                className={`block bg-dark-soft p-4 transition-colors hover:bg-dark-card ${selected === suc.id ? 'bg-dark-card' : ''}`}>
+                className={`flex w-full flex-col bg-dark-soft p-4 transition-colors hover:bg-dark-card ${selected === suc.id ? 'bg-dark-card' : ''}`}>
                 <span className="text-[10px] text-campo">{String(suc.id).padStart(2, '0')}</span>
-                <h4 className="mt-1 font-heading text-xs font-bold text-cream leading-tight">{suc.nombre}</h4>
+                <h4 className="mt-1 font-heading text-xs font-bold text-cream leading-tight min-h-[2.2em]">{suc.nombre}</h4>
                 <p className="mt-1 text-[10px] text-warm truncate">{suc.telefono ?? ''}</p>
               </Link>
             </motion.div>

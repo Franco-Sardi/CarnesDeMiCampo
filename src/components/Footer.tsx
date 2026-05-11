@@ -20,7 +20,7 @@ export default function Footer() {
               Carnes de mi Campo
             </h3>
             <p className="mt-4 max-w-xs text-xs leading-relaxed text-cream/30">
-              100% integrados. Participamos en todas las etapas de la cadena de valor para ofrecerte la mejor carne de Mendoza.
+              100% integrados. Participamos en todas las etapas de la cadena de valor para ofrecerte la mejor carne, directo a tu mesa.
             </p>
           </div>
 
@@ -29,7 +29,7 @@ export default function Footer() {
             <h4 className="text-[9px] font-medium uppercase tracking-[0.25em] text-dorado/40">
               Navegación
             </h4>
-            <ul className="mt-4 flex flex-col gap-2">
+            <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-1">
               {links.map(l => (
                 <li key={l.href}>
                   <a
