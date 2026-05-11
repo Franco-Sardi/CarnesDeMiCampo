@@ -55,16 +55,13 @@ export default function SucursalPage() {
   const telDigits = (suc.telefono ?? '').replace(/[^0-9]/g, '')
 
   return (
-    <div className="min-h-screen bg-dark">
-      {/* Header */}
-      <div className="bg-campo-dark">
-        <div className="mx-auto max-w-7xl px-5 py-6 sm:px-6 lg:px-8">
-          <Link to="/#sucursales" className="text-xs text-cream/40 transition-colors hover:text-cream">← Volver a sucursales</Link>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-dark pt-20">
       {/* Map hero */}
-      <div className="h-[40vh] sm:h-[50vh]">
+      <div className="relative h-[40vh] sm:h-[50vh]">
+        <Link to="/#sucursales"
+          className="absolute left-4 top-4 z-10 inline-flex items-center gap-2 rounded-full border border-cream/15 bg-dark/70 px-3 py-1.5 text-[11px] text-cream/70 backdrop-blur-sm transition-colors hover:bg-dark hover:text-cream">
+          ← Volver a sucursales
+        </Link>
         <Map initialViewState={{ longitude: lng, latitude: lat, zoom: 14 }}
           style={{ width: '100%', height: '100%' }}
           mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"

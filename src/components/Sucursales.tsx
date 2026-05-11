@@ -1,28 +1,44 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'motion/react'
 import { Link } from 'react-router-dom'
-import Map, { Marker, Popup } from 'react-map-gl/maplibre'
+import Map, { Marker, Popup, type MapRef } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useSucursales } from '../hooks/usePedidos'
 
-// Fallback coordinates si la sucursal aún no tiene lat/lng cargados
+// Fallback: coords reales (Mendoza) por si lat/lng no vienen de Supabase
 const coordsFallback: Record<number, [number, number]> = {
-  1: [-68.5017, -32.9282],
-  2: [-68.5000, -32.9270],
-  3: [-68.5750, -32.9830],
-  4: [-68.5780, -32.9800],
-  5: [-68.5050, -32.9250],
-  6: [-68.5650, -32.9700],
+  1: [-68.83517697, -32.92659802],
+  2: [-68.83578523, -32.92700324],
+  3: [-68.87262348, -32.98060564],
+  4: [-68.87989240, -32.98580251],
+  5: [-68.81968151, -32.92596674],
+  6: [-68.88713857, -33.00648925],
 }
 
 export default function Sucursales() {
   const [selected, setSelected] = useState<number | null>(null)
   const { sucursales, loading } = useSucursales()
+  const mapRef = useRef<MapRef | null>(null)
+  const [mapLoaded, setMapLoaded] = useState(false)
 
   const getCoords = (id: number, lng?: number, lat?: number): [number, number] => {
     if (typeof lng === 'number' && typeof lat === 'number') return [lng, lat]
-    return coordsFallback[id] ?? [-68.54, -32.95]
+    return coordsFallback[id] ?? [-68.85, -32.96]
   }
+
+  // Auto-fit del mapa a las sucursales cargadas (vista inicial coherente
+  // en cualquier viewport, sin depender de un zoom hardcodeado).
+  useEffect(() => {
+    if (!mapLoaded || !mapRef.current || sucursales.length === 0) return
+    const coords = sucursales.map(s => getCoords(s.id, s.lng, s.lat))
+    const lngs = coords.map(c => c[0])
+    const lats = coords.map(c => c[1])
+    const bounds: [[number, number], [number, number]] = [
+      [Math.min(...lngs), Math.min(...lats)],
+      [Math.max(...lngs), Math.max(...lats)],
+    ]
+    mapRef.current.fitBounds(bounds, { padding: 90, duration: 0, maxZoom: 13 })
+  }, [mapLoaded, sucursales])
 
   return (
     <section id="sucursales" className="bg-dark-soft py-8 sm:py-12">
@@ -50,7 +66,9 @@ export default function Sucursales() {
           viewport={{ once: true }} transition={{ duration: 0.8 }}
           className="mt-10 overflow-hidden border border-dark-border" style={{ height: 'clamp(300px, 50vh, 500px)' }}>
           <Map
-            initialViewState={{ longitude: -68.54, latitude: -32.955, zoom: 11.5 }}
+            ref={mapRef}
+            onLoad={() => setMapLoaded(true)}
+            initialViewState={{ longitude: -68.85, latitude: -32.96, zoom: 11 }}
             style={{ width: '100%', height: '100%' }}
             mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
             attributionControl={false}
@@ -74,10 +92,10 @@ export default function Sucursales() {
               if (!suc) return null
               const [lng, lat] = getCoords(suc.id, suc.lng, suc.lat)
               return (
-                <Popup longitude={lng} latitude={lat} anchor="bottom" offset={35}
+                <Popup longitude={lng} latitude={lat} offset={20} maxWidth="280px"
                   onClose={() => setSelected(null)} closeButton={false}
-                  className="[&_.maplibregl-popup-content]:!bg-dark-card [&_.maplibregl-popup-content]:!p-0 [&_.maplibregl-popup-content]:!border [&_.maplibregl-popup-content]:!border-dark-border [&_.maplibregl-popup-tip]:!border-t-dark-card">
-                  <div className="p-4 min-w-[200px]">
+                  className="[&_.maplibregl-popup-content]:!bg-dark-card [&_.maplibregl-popup-content]:!p-0 [&_.maplibregl-popup-content]:!border [&_.maplibregl-popup-content]:!border-dark-border">
+                  <div className="p-4 w-[240px]">
                     <h3 className="font-heading text-sm font-bold text-cream">{suc.nombre}</h3>
                     <p className="mt-1 text-xs text-warm">{suc.direccion}</p>
                     <p className="text-xs text-warm">{suc.telefono ?? '—'}{suc.horarios ? ` · ${suc.horarios}` : ''}</p>

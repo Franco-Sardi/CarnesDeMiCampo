@@ -158,12 +158,12 @@ GRANT EXECUTE ON FUNCTION crear_pedido_completo(BIGINT, TEXT, TEXT, TEXT, JSONB)
 -- Nota: durante el demo todas las sucursales apuntan al mismo WhatsApp del cliente.
 -- Cuando tengamos los números reales de cada local, se actualiza con UPDATE.
 INSERT INTO sucursales (nombre, direccion, ciudad, telefono, whatsapp, horarios, lat, lng, orden) VALUES
-  ('Casa Central - Mayorista',    'Elpidio González 320, Dorrego - Guaymallén, Mendoza',         'Guaymallén',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.9282, -68.5017, 1),
-  ('Sucursal Elpidio',            'Elpidio González 488, Dorrego - Guaymallén, Mendoza',         'Guaymallén',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.9270, -68.5000, 2),
-  ('La Bonita - Chacras de Coria','Besares 833, Chacras de Coria - Luján, Mendoza',              'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.9830, -68.5750, 3),
-  ('Liniers Green Market',        'Liniers 1051, Chacras de Coria - Luján, Mendoza',             'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Dom 8:00-21:00', -32.9800, -68.5780, 4),
-  ('Sucursal Rodríguez Peña',     'Rodríguez Peña 1412, Dorrego - Guaymallén, Mendoza',          'Guaymallén',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.9250, -68.5050, 5),
-  ('Sobremonte Market',           'Viamonte, Luján de Cuyo, Mendoza',                            'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Dom 8:00-21:00', -32.9700, -68.5650, 6);
+  ('Casa Central - Mayorista',    'Elpidio González 320, Godoy Cruz, Mendoza',                   'Godoy Cruz',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.92659802, -68.83517697, 1),
+  ('Sucursal Elpidio',            'Elpidio González 488, Guaymallén, Mendoza',                   'Guaymallén',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.92700324, -68.83578523, 2),
+  ('La Bonita - Chacras de Coria','Besares 833, Chacras de Coria, Luján de Cuyo, Mendoza',       'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.98060564, -68.87262348, 3),
+  ('Liniers Green Market',        'Liniers 1051, Luján de Cuyo, Mendoza',                        'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Dom 8:00-21:00', -32.98580251, -68.87989240, 4),
+  ('Sucursal Rodríguez Peña',     'Carril Rodríguez Peña 1412, Godoy Cruz, Mendoza',             'Godoy Cruz',     '2612 34-2674', '5492612342674', 'Lun-Sáb 8:00-20:00', -32.92596674, -68.81968151, 5),
+  ('Sobremonte Market',           'Viamonte 3475, Chacras de Coria, Luján de Cuyo, Mendoza',     'Luján de Cuyo',  '2612 34-2674', '5492612342674', 'Lun-Dom 8:00-21:00', -33.00648925, -68.88713857, 6);
 
 -- ── 8) Verificación ────────────────────────────────────────────────────────
 -- Después de aplicar todo lo anterior, probar con:
