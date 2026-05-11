@@ -1,10 +1,12 @@
+import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import Map, { Marker } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { sucursales } from '../data/productos'
+import { supabase } from '../lib/supabase'
+import type { Sucursal } from '../hooks/usePedidos'
 
-const coords: Record<number, [number, number]> = {
+const coordsFallback: Record<number, [number, number]> = {
   1: [-68.5017, -32.9282],
   2: [-68.5000, -32.9270],
   3: [-68.5750, -32.9830],
@@ -15,7 +17,28 @@ const coords: Record<number, [number, number]> = {
 
 export default function SucursalPage() {
   const { id } = useParams()
-  const suc = sucursales.find(s => s.id === Number(id))
+  const [suc, setSuc] = useState<Sucursal | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!id) return
+    supabase
+      .from('sucursales')
+      .select('*')
+      .eq('id', Number(id))
+      .eq('activa', true)
+      .maybeSingle()
+      .then(({ data }) => {
+        setSuc(data)
+        setLoading(false)
+      })
+  }, [id])
+
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-dark">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-dorado border-t-transparent" />
+    </div>
+  )
 
   if (!suc) return (
     <div className="flex min-h-screen items-center justify-center bg-dark">
@@ -26,8 +49,10 @@ export default function SucursalPage() {
     </div>
   )
 
-  const [lng, lat] = coords[suc.id] || [-68.54, -32.95]
+  const lng = suc.lng ?? coordsFallback[suc.id]?.[0] ?? -68.54
+  const lat = suc.lat ?? coordsFallback[suc.id]?.[1] ?? -32.95
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(suc.direccion)}`
+  const telDigits = (suc.telefono ?? '').replace(/[^0-9]/g, '')
 
   return (
     <div className="min-h-screen bg-dark">
@@ -68,14 +93,18 @@ export default function SucursalPage() {
               <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Dirección</h3>
               <p className="mt-1 text-sm text-cream/70">{suc.direccion}</p>
             </div>
-            <div>
-              <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Teléfono</h3>
-              <p className="mt-1 text-sm text-cream/70">{suc.telefono}</p>
-            </div>
-            <div>
-              <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Horario</h3>
-              <p className="mt-1 text-sm text-cream/70">{suc.horario}</p>
-            </div>
+            {suc.telefono && (
+              <div>
+                <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Teléfono</h3>
+                <p className="mt-1 text-sm text-cream/70">{suc.telefono}</p>
+              </div>
+            )}
+            {suc.horarios && (
+              <div>
+                <h3 className="text-[10px] font-medium uppercase tracking-[0.2em] text-campo">Horario</h3>
+                <p className="mt-1 text-sm text-cream/70">{suc.horarios}</p>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-3">
@@ -86,15 +115,19 @@ export default function SucursalPage() {
               </svg>
               Cómo llegar
             </a>
-            <a href={`https://wa.me/54${suc.telefono.replace(/[^0-9]/g, '')}`}
-              target="_blank" rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 border border-[#25D366]/20 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[#25D366] transition-all hover:bg-[#25D366]/10">
-              WhatsApp
-            </a>
-            <a href={`tel:+54${suc.telefono.replace(/[^0-9]/g, '')}`}
-              className="flex items-center justify-center gap-2 border border-dark-border px-6 py-3 text-xs font-semibold uppercase tracking-wider text-cream/50 transition-all hover:border-cream/30 hover:text-cream">
-              Llamar
-            </a>
+            {(suc.whatsapp || telDigits) && (
+              <a href={`https://wa.me/${suc.whatsapp ?? `54${telDigits}`}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 border border-[#25D366]/20 px-6 py-3 text-xs font-semibold uppercase tracking-wider text-[#25D366] transition-all hover:bg-[#25D366]/10">
+                WhatsApp
+              </a>
+            )}
+            {telDigits && (
+              <a href={`tel:+54${telDigits}`}
+                className="flex items-center justify-center gap-2 border border-dark-border px-6 py-3 text-xs font-semibold uppercase tracking-wider text-cream/50 transition-all hover:border-cream/30 hover:text-cream">
+                Llamar
+              </a>
+            )}
           </div>
         </motion.div>
       </div>

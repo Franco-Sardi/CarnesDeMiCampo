@@ -1,24 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand: Green campo + white + earth tones */
+  /* ── 60% Dominant Darks — warm charcoal ── */
+  --color-dark: #120F0B;
+  --color-dark-soft: #1C1813;
+  --color-dark-card: #231E18;
+  --color-dark-border: #2E2820;
+
+  /* ── 30% Secondary — warm cream/ivory ── */
+  --color-cream: #F0E8D6;
+  --color-cream-dark: #CEC4B2;
+  --color-warm: #8A7E72;
+
+  /* ── 10% Accent A: Dorado/Gold — decorative lines, borders, eyebrows ── */
+  --color-dorado: #C09040;
+  --color-dorado-light: #D4A84E;
+  --color-dorado-dark: #8A6628;
+
+  /* ── 10% Accent B: Campo Green — interactive states, primary CTAs ── */
   --color-campo: #2d6a4f;
   --color-campo-light: #40916c;
   --color-campo-dark: #1b4332;
   --color-campo-50: #d8f3dc;
 
-  --color-tierra: #8b6f47;
-  --color-tierra-light: #a68b5b;
-
-  --color-dark: #0c0f0a;
-  --color-dark-soft: #141a12;
-  --color-dark-card: #1a2118;
-  --color-dark-border: #2a332a;
-
-  --color-cream: #f5f5f0;
-  --color-cream-dark: #ddd8ce;
-  --color-warm: #999990;
-
+  /* ── Typography ── */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
   --font-heading: 'Playfair Display', Georgia, serif;
   --font-body: 'Inter', system-ui, sans-serif;
 }
@@ -35,18 +41,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Grain overlay */
+/* Grain overlay — analog texture, subconscious premium signal */
 .grain::after {
   content: '';
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.03;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Horizontal scroll */
+/* Horizontal scroll (mobile product rail) */
 .h-scroll {
   display: flex;
   gap: 1.25rem;
@@ -67,13 +73,55 @@ body {
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marquee 40s linear infinite;
+  animation: marquee 50s linear infinite;
 }
 
-/* Text gradient */
+/* Text gradient — gold variant (hero, featured text) */
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-dorado-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Text gradient — green variant (kept for compatibility) */
 .text-gradient-green {
   background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-campo-light) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* Admin form field utilities */
+.field-label {
+  display: block;
+  margin-bottom: 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-cream) 40%, transparent);
+}
+
+.field-input {
+  width: 100%;
+  background: color-mix(in srgb, var(--color-dark) 60%, transparent);
+  border: 1px solid var(--color-dark-border);
+  color: var(--color-cream);
+  font-size: 0.8125rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.field-input::placeholder {
+  color: color-mix(in srgb, var(--color-cream) 20%, transparent);
+}
+.field-input:focus {
+  border-color: color-mix(in srgb, var(--color-dorado) 50%, transparent);
+}
+
+.field-error {
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  color: color-mix(in srgb, var(--color-dorado) 70%, transparent);
 }

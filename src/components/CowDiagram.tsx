@@ -190,89 +190,121 @@ export const cuts: CutRegion[] = [
 ]
 
 interface Props {
+  /** 'display' = modo normal de la landing (hover + tooltip).
+   *  'selector' = modo admin: click selecciona un corte, se resalta en dorado. */
+  mode?: 'display' | 'selector'
   activeCut?: string
   onCutClick?: (id: string) => void
+  /** Solo válido en mode='selector': el cut_id actualmente seleccionado */
+  selectedCut?: string
+  onSelect?: (cutId: string) => void
   interactive?: boolean
 }
 
-export default function CowDiagram({ activeCut, onCutClick, interactive = true }: Props) {
+export default function CowDiagram({
+  mode = 'display',
+  activeCut,
+  onCutClick,
+  selectedCut,
+  onSelect,
+  interactive = true,
+}: Props) {
   const uid = useId().replace(/:/g, '')
   const clipId = `cowClip-${uid}`
   const [hovered, setHovered] = useState<string | null>(null)
   const tooltipCut = cuts.find(c => c.id === hovered)
 
+  const isSelector = mode === 'selector'
+
   return (
     <div className="relative w-full">
-      <svg viewBox="0 0 640 430" className="w-full" style={{ maxHeight: '52vh' }}>
+      {isSelector && (
+        <p className="mb-2 text-center text-[10px] uppercase tracking-[0.25em] text-dorado/50">
+          Hacé click en la zona del corte
+        </p>
+      )}
+      <svg viewBox="0 0 640 430" className="w-full" style={{ maxHeight: isSelector ? '38vh' : '52vh' }}>
         <defs>
-          {/* Clip cuts to the cow silhouette so they never bleed outside */}
           <clipPath id={clipId}>
             <path d={cowOutline} />
           </clipPath>
         </defs>
 
-        {/* Realistic cow silhouette — CC0 Public Domain (OpenClipart / Firkin) */}
         <path
           d={cowOutline}
-          fill="rgba(45,106,79,0.07)"
-          stroke="rgba(45,106,79,0.28)"
+          fill={isSelector ? 'rgba(192,144,64,0.06)' : 'rgba(45,106,79,0.07)'}
+          stroke={isSelector ? 'rgba(192,144,64,0.22)' : 'rgba(45,106,79,0.28)'}
           strokeWidth="1.4"
           strokeLinejoin="round"
         />
 
-        {/* Eye */}
-        <circle cx="85" cy="98" r="4.5" fill="rgba(45,106,79,0.55)" />
+        <circle cx="85" cy="98" r="4.5" fill={isSelector ? 'rgba(192,144,64,0.45)' : 'rgba(45,106,79,0.55)'} />
 
-        {/* Cut regions — clipped to cow body, static mode shows only the active cut */}
         <g clipPath={`url(#${clipId})`}>
           {cuts
-            .filter(cut => interactive || cut.id === activeCut)
+            .filter(cut => (!isSelector && !interactive) ? cut.id === activeCut : true)
             .map((cut) => {
-              const isActive = activeCut === cut.id
+              const isActive = isSelector ? selectedCut === cut.id : activeCut === cut.id
               const isHover = hovered === cut.id
+
+              // Colores según modo
+              const fill = isSelector
+                ? isActive ? '#C09040' : isHover ? '#D4A84E' : '#C09040'
+                : isActive ? '#2d6a4f' : isHover ? '#40916c' : '#2d6a4f'
+
+              const stroke = isSelector
+                ? isActive ? '#F0E8D6' : isHover ? '#D4A84E' : 'rgba(192,144,64,0.2)'
+                : isActive ? '#d8f3dc' : isHover ? '#40916c' : 'rgba(45,106,79,0.25)'
+
+              const opacity = isActive ? 0.8 : isHover ? 0.45 : isSelector ? 0.1 : 0.13
 
               return (
                 <motion.path
                   key={cut.id}
                   d={cut.path}
                   initial={{ opacity: 0 }}
-                  animate={{
-                    opacity: isActive ? 0.75 : isHover ? 0.5 : 0.13,
-                  }}
-                  transition={{ duration: 0.25 }}
-                  fill={isActive ? '#2d6a4f' : isHover ? '#40916c' : '#2d6a4f'}
-                  stroke={isActive ? '#d8f3dc' : isHover ? '#40916c' : 'rgba(45,106,79,0.25)'}
+                  animate={{ opacity }}
+                  transition={{ duration: 0.2 }}
+                  fill={fill}
+                  stroke={stroke}
                   strokeWidth={isActive ? 1.5 : 0.8}
-                  style={{ cursor: interactive ? 'pointer' : 'default' }}
-                  onMouseEnter={() => interactive && setHovered(cut.id)}
+                  style={{ cursor: isSelector || interactive ? 'pointer' : 'default' }}
+                  onMouseEnter={() => (isSelector || interactive) && setHovered(cut.id)}
                   onMouseLeave={() => setHovered(null)}
-                  onClick={() => interactive && onCutClick?.(cut.id)}
+                  onClick={() => {
+                    if (isSelector) {
+                      onSelect?.(cut.id)
+                    } else if (interactive) {
+                      onCutClick?.(cut.id)
+                    }
+                  }}
                 />
               )
             })}
         </g>
 
-        {/* Label + dashed connector for active / hovered cut */}
-        {(activeCut || hovered) && (() => {
-          const cut = cuts.find(c => c.id === (hovered || activeCut))
+        {/* Label connector — muestra corte activo o hovered */}
+        {(activeCut || selectedCut || hovered) && (() => {
+          const cut = cuts.find(c => c.id === (hovered || selectedCut || activeCut))
           if (!cut) return null
           const nums = (cut.path.match(/[\d.]+/g) || []).map(Number)
           const xs = nums.filter((_, i) => i % 2 === 0)
           const ys = nums.filter((_, i) => i % 2 === 1)
           const cx = xs.reduce((a, b) => a + b, 0) / xs.length
           const cy = ys.reduce((a, b) => a + b, 0) / ys.length
-          // Label always goes to the left — keeps text within the 640px viewBox
           const lx = cx - 80
           const ly = Math.max(28, cy - 50)
+          const lineColor = isSelector ? '#C09040' : '#d8f3dc'
+          const dotColor = isSelector ? '#C09040' : '#d8f3dc'
 
           return (
             <g>
               <line x1={cx} y1={cy} x2={lx} y2={ly}
-                stroke="#d8f3dc" strokeWidth="0.6" strokeDasharray="4,3" />
-              <circle cx={cx} cy={cy} r="4" fill="#d8f3dc" opacity="0.7" />
+                stroke={lineColor} strokeWidth="0.6" strokeDasharray="4,3" />
+              <circle cx={cx} cy={cy} r="4" fill={dotColor} opacity="0.7" />
               <text
                 x={lx - 5} y={ly - 4}
-                fill="#d8f3dc" fontSize="14" fontWeight="700"
+                fill={lineColor} fontSize="14" fontWeight="700"
                 textAnchor="end"
                 fontFamily="Inter, sans-serif"
               >
@@ -283,9 +315,9 @@ export default function CowDiagram({ activeCut, onCutClick, interactive = true }
         })()}
       </svg>
 
-      {/* Hover tooltip */}
+      {/* Tooltip — solo en modo display */}
       <AnimatePresence>
-        {interactive && tooltipCut && (
+        {!isSelector && interactive && tooltipCut && (
           <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
@@ -297,6 +329,27 @@ export default function CowDiagram({ activeCut, onCutClick, interactive = true }
               {tooltipCut.description}
             </p>
           </motion.div>
+        )}
+        {/* En modo selector: label del corte seleccionado bajo el diagrama */}
+        {isSelector && selectedCut && !hovered && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mt-1 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-dorado"
+          >
+            {cuts.find(c => c.id === selectedCut)?.name}
+          </motion.p>
+        )}
+        {isSelector && hovered && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="mt-1 text-center text-[11px] uppercase tracking-[0.18em] text-dorado/60"
+          >
+            {cuts.find(c => c.id === hovered)?.name}
+          </motion.p>
         )}
       </AnimatePresence>
     </div>

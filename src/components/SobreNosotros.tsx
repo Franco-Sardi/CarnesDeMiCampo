@@ -1,110 +1,227 @@
-import { motion } from 'motion/react'
+import { useRef, useEffect } from 'react'
+import { motion, useScroll, useTransform, useMotionValue, useInView, animate } from 'motion/react'
+import logo from '../assets/logo-web_Mesa-de-trabajo-1-1024x983.png'
 
 const stats = [
-  { n: '2006', l: 'Fundación' },
-  { n: '6', l: 'Sucursales' },
-  { n: '100%', l: 'Integrados' },
+  { from: 1995, to: 2006, suffix: '', label: 'Fundación' },
+  { from: 0,    to: 6,    suffix: '', label: 'Sucursales' },
+  { from: 50,   to: 100,  suffix: '%', label: 'Integrados' },
+  { from: 0,    to: 20,   suffix: '+', label: 'Años' },
 ]
 
 const pilares = [
-  {
-    title: 'Del campo a tu mesa',
-    desc: 'Controlamos cada etapa de la cadena: la cría, el proceso y la venta. Sin intermediarios. Eso se nota en cada corte.',
-  },
-  {
-    title: 'Tradición mendocina',
-    desc: 'Nacimos en Mendoza y crecimos con ella. Desde Dorrego hasta Chacras de Coria, somos parte del paisaje gastronómico provincial.',
-  },
-  {
-    title: 'Más que una carnicería',
-    desc: 'Nuestros espacios combinan carnicería, fiambrería y experiencia gourmet. Porque una buena carne merece un contexto a la altura.',
-  },
+  { n: '01', title: 'Del campo a tu mesa',      desc: 'Controlamos cada eslabón: cría, proceso y venta. Sin intermediarios que comprometan la calidad.' },
+  { n: '02', title: 'Tradición mendocina',       desc: 'Nacimos en Mendoza y crecimos con ella. Parte del paisaje gastronómico provincial desde 2006.' },
+  { n: '03', title: 'Mayoristas de confianza',  desc: 'Proveemos carnicerías y restaurantes con requisitos únicos. Calidad premium, logística y servicio que supera expectativas.' },
 ]
 
-export default function SobreNosotros() {
+function CountUp({ from, to, suffix }: { from: number; to: number; suffix: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const count = useMotionValue(from)
+  const rounded = useTransform(count, Math.round)
+  const inView = useInView(ref, { once: true, amount: 0.3 })
+
+  useEffect(() => {
+    if (!inView) return
+    const controls = animate(count, to, { duration: 2.2, ease: [0.16, 1, 0.3, 1] })
+    return controls.stop
+  }, [inView, count, to])
+
   return (
-    <section id="nosotros" className="bg-campo-dark py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
+    <span ref={ref} className="tabular-nums">
+      <motion.span>{rounded}</motion.span>
+      {suffix}
+    </span>
+  )
+}
 
-        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+function WordReveal({ text }: { text: string }) {
+  const words = text.split(' ')
+  return (
+    <motion.p
+      variants={{
+        hidden: {},
+        visible: { transition: { staggerChildren: 0.045, delayChildren: 0.1 } },
+      }}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0 }}
+      className="mt-5 text-sm leading-relaxed text-cream/50"
+    >
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          variants={{
+            hidden:  { opacity: 0, y: 14, filter: 'blur(5px)' },
+            visible: { opacity: 1, y: 0,  filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+          }}
+          className="inline-block mr-[0.3em]"
+        >
+          {word}
+        </motion.span>
+      ))}
+    </motion.p>
+  )
+}
 
-          {/* Image side */}
-          <motion.div initial={{ opacity: 0, scale: 0.96 }} whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }} transition={{ duration: 0.8 }}
-            className="relative">
-            <div className="relative aspect-[4/3] overflow-hidden lg:aspect-[3/4]">
-              <img
-                src="https://images.unsplash.com/photo-1500595046743-cd271d694d30?w=800&q=80"
-                alt="Campos de Mendoza"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-campo-dark/60 to-transparent" />
-            </div>
+export default function SobreNosotros() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
 
-            {/* Stats row over image */}
-            <div className="absolute bottom-0 left-0 right-0 flex justify-around border-t border-cream/10 bg-dark/70 px-4 py-4 backdrop-blur-sm">
-              {stats.map((s, i) => (
-                <motion.div key={s.l} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: 0.4 + i * 0.1 }}
-                  className="text-center">
-                  <div className="font-heading text-2xl font-bold text-cream sm:text-3xl">{s.n}</div>
-                  <div className="text-[9px] uppercase tracking-[0.18em] text-cream/45">{s.l}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+  const xLeft  = useTransform(scrollYProgress, [0, 1], ['4%',  '-18%'])
+  const xRight = useTransform(scrollYProgress, [0, 1], ['-4%', '18%'])
 
-          {/* Text side */}
+  return (
+    <section ref={sectionRef} id="nosotros" className="bg-dark-soft">
+
+      {/* ── Scroll-linked opposing marquee ── */}
+      <div className="overflow-hidden border-y border-dark-border py-5">
+        <motion.p
+          style={{ x: xLeft }}
+          className="whitespace-nowrap font-heading text-[clamp(1.6rem,3.5vw,3rem)] font-bold uppercase leading-none tracking-[0.12em] text-cream/[0.05]"
+        >
+          {'Nuestra Historia · Mendoza · Campo Propio · Ganadería Sustentable · Nuestra Historia · Mendoza · Campo Propio · Ganadería Sustentable ·'}
+        </motion.p>
+        <motion.p
+          style={{ x: xRight }}
+          className="mt-1 whitespace-nowrap font-display text-[clamp(1.6rem,3.5vw,3rem)] font-light italic leading-none tracking-[0.08em] text-dorado/[0.14]"
+        >
+          {'Quiénes Somos · Pasión · Origen · Calidad · Compromiso · Quiénes Somos · Pasión · Origen · Calidad · Compromiso ·'}
+        </motion.p>
+      </div>
+
+      {/* ── Main content ── */}
+      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8 lg:py-16">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-20 lg:items-start">
+
+          {/* ── Left: editorial text block ── */}
           <div>
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="mb-3 flex items-center gap-3">
-              <div className="h-px w-10 bg-cream/30" />
-              <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-cream/50">Quiénes somos</span>
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0 }}
+              className="mb-4"
+            >
+              <div className="mb-3 h-[2px] w-10 bg-dorado" />
+              <span className="text-[10px] font-medium uppercase tracking-[0.38em] text-dorado/60">
+                Quiénes somos
+              </span>
             </motion.div>
 
-            <motion.h2 initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ duration: 0.7 }}
-              className="font-heading text-3xl font-bold leading-tight text-cream sm:text-4xl lg:text-5xl">
-              El sabor de<br />
-              <span className="text-gradient-green">nuestra historia</span>
+            {/* Heading */}
+            <motion.h2
+              initial={{ opacity: 0, y: 22 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+              className="font-heading text-3xl font-bold leading-tight text-cream sm:text-4xl"
+            >
+              El sabor de{' '}
+              <span className="text-gradient-gold">nuestra historia</span>
             </motion.h2>
 
-            <motion.p initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }} transition={{ delay: 0.15 }}
-              className="mt-5 text-sm leading-relaxed text-cream/60 sm:text-base">
-              Desde 2006 somos una empresa 100% integrada: participamos en cada eslabón de la cadena de valor, desde la cría del ganado hasta el mostrador. Sin intermediarios que comprometan lo que más importa: <em className="text-cream/80 not-italic">la calidad en tu plato</em>.
-            </motion.p>
-
-            {/* Pilares */}
-            <div className="mt-8 space-y-5">
-              {pilares.map((p, i) => (
-                <motion.div key={p.title}
-                  initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.12 }}
-                  className="flex gap-4">
-                  <div className="mt-1 h-4 w-4 shrink-0">
-                    <div className="h-full w-full border border-campo/60 bg-campo/15" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-cream/90">{p.title}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-cream/50">{p.desc}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+            <WordReveal text="Desde 2006 somos una empresa 100% integrada: participamos en cada eslabón de la cadena de valor, desde la cría del ganado hasta el mostrador. Sin intermediarios." />
 
             <motion.a
               href="/#contacto"
-              initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-              viewport={{ once: true }} transition={{ delay: 0.5 }}
-              className="mt-8 inline-flex items-center gap-2 border border-cream/20 px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-cream/60 transition-all hover:border-cream/50 hover:text-cream">
-              Contactanos
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ delay: 0.4 }}
+              className="group relative mt-8 inline-flex cursor-pointer items-center gap-3 overflow-hidden border border-dorado/30 px-5 py-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-cream/50 transition-colors duration-300 hover:border-dorado hover:text-cream"
+            >
+              <span className="absolute inset-0 -translate-x-full bg-dorado/8 transition-transform duration-500 group-hover:translate-x-0" />
+              <span className="relative">Contactanos</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="relative transition-transform group-hover:translate-x-1">
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </motion.a>
+
+            {/* Logo centrado */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ duration: 1.2, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              className="mt-12 flex justify-center"
+            >
+              <div className="relative">
+                {/* Glow dorado detrás */}
+                <div className="absolute inset-0 rounded-full bg-dorado/15 blur-3xl scale-125" />
+                {/* Anillo exterior dashed */}
+                <div className="absolute inset-[-18px] rounded-full border border-dashed border-dorado/20" />
+                {/* Anillo interior sólido */}
+                <div className="absolute inset-[-8px] rounded-full border border-dorado/30" />
+                <img
+                  src={logo}
+                  alt="Carnes de mi Campo"
+                  className="relative h-44 w-auto"
+                />
+              </div>
+            </motion.div>
           </div>
 
+          {/* ── Right: stats + pilares ── */}
+          <div>
+
+            {/* 2x2 counter grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0 }}
+              transition={{ duration: 0.55 }}
+              className="mb-8 grid grid-cols-2 gap-px border border-dark-border bg-dark-border"
+            >
+              {stats.map((s) => (
+                <div key={s.label} className="bg-dark-soft px-5 py-5 text-center">
+                  <div className="font-display text-3xl font-light italic leading-none text-dorado">
+                    <CountUp from={s.from} to={s.to} suffix={s.suffix} />
+                  </div>
+                  <div className="mt-1.5 text-[8px] font-semibold uppercase tracking-[0.25em] text-cream/30">
+                    {s.label}
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Pilares — 3D tilt hover */}
+            <motion.div
+              variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.09 } } }}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0 }}
+              className="space-y-3"
+            >
+              {pilares.map((p) => (
+                <motion.div
+                  key={p.n}
+                  variants={{
+                    hidden:  { opacity: 0, x: 18 },
+                    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
+                  }}
+                  whileHover={{
+                    y: -3,
+                    rotateX: 3,
+                    rotateY: -2,
+                    boxShadow: '0 16px 40px rgba(0,0,0,0.45)',
+                    transition: { type: 'spring', stiffness: 280, damping: 22 },
+                  }}
+                  style={{ transformStyle: 'preserve-3d', transformPerspective: 900 }}
+                  className="flex cursor-default gap-4 border border-dark-border bg-dark-card p-4"
+                >
+                  <span className="mt-0.5 shrink-0 font-display text-xs italic text-dorado/40">{p.n}</span>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-cream/85">{p.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-cream/40">{p.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+          </div>
         </div>
       </div>
     </section>
